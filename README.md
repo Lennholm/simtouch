@@ -7,11 +7,12 @@ This script will place a button labeled "Touch" in the top left corner of the pa
 
 Pressing down the mouse button will trigger a touchstart event, no other touch events are triggered unless touchstart happens. Moving the mouse pointer while pressing the button will trigger touchmove events, moving the mouse pointer over an element will trigger a touchenter event on that element, moving the mouse pointer away from an element will trigger a touchleave event on that element and releasing the mouse button will trigger a touchend event. The touchcancel event is never triggered.
 
-The touch events conform to the interface specification, meaning they will have the TouchLists 'touches', 'targetTouches' and 'changedTouches'. Since only one touch point is possible, all these TouchLists are identical. The touch event also has the 'relatedTarget' property and the required modifier key flags.
+The touch events conform to the interface specification, meaning they will have the TouchLists 'touches', 'targetTouches' and 'changedTouches'. Since only one touch point is possible, all these TouchLists are identical. The touch event also has the 'relatedTarget' property and the required flags for modifier keys.
 
-The TouchLists also conform to their interface specification meaning they have the getter functions 'item' and 'identifiedTouch'. Since only one touch point is possible, '0' is the only value for 'item' that will return a touch point.
+The TouchLists also conform to their interface specification meaning they have the getter functions 'item' and 'identifiedTouch'. Since only one touch point is possible, '0' is the only parameter value for 'item' that will return a touch point.
 
 Likewise, the Touch point conform to it's interface specification meaning it will have the coordinate properties 'pageX', 'pageY', 'screenX', 'screenY', 'clientX' and 'clientY' as well as 'target', 'identifier' and mockups for 'radiusX', 'radiusY', 'rotationAngle' and 'force'.
+
 
 The simulation can be turned off by clicking the "Touch" button again.
 
