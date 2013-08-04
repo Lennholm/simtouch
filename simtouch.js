@@ -1,7 +1,7 @@
 ;(function(document, window){
     var button = document.createElement("button"),
         active = false,
-        touchmove = false,
+        touchId = null,
         mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove", mouseover: "touchenter", mouseout: "touchleave"},
         interceptions = ["mouseover","mouseout","mouseenter","mouseleave","mousemove","mousedown","mouseup","click"];
 
@@ -21,17 +21,35 @@
     function intercept(event){
         event.stopPropagation();
         event.preventDefault();
-        if (!touchmove && /mousemove|mouseover|mouseout/.test(event.type))
+        if (!touchId && /mousemove|mouseover|mouseout/.test(event.type))
             return;
         if (event.type == "click" && event.target == button){
             toggleSim();
         } else if (mappings[event.type]){
+            if (event.type == "mousedown")
+                touchId = parseInt(Math.random()*1e10);
             var dEvt = document.createEvent("HTMLEvents");
             dEvt.initEvent(mappings[event.type], true, true);
             dEvt.touches = [{
+                clientX: event.clientX,
+                clientY: event.clientY,
+                force: 0,
+                identifier: touchId,
                 pageX: event.pageX,
-                pageY: event.pageY
+                pageY: event.pageY,
+                radiusX: 1,
+                radiusY: 1,
+                rotationAngle: 0,
+                screenX: event.screenX,
+                screenY: event.screenY,
+                target: event.target
             }];
+            dEvt.touches.item = function(i){
+                return dEvt.touches[i] || null;
+            };
+            dEvt.touches.identifiedTouch = function(id){
+                return dEvt.touches[0].identifier == id ? dEvt.touches[0] : null;
+            };
             dEvt.targetTouches = dEvt.touches;
             dEvt.changedTouches = dEvt.touches;
             dEvt.relatedTarget = event.relatedTarget;
@@ -40,10 +58,8 @@
             dEvt.metaKey = event.metaKey;
             dEvt.shiftKey = event.shiftKey;
             event.target.dispatchEvent(dEvt);
-            if (event.type == "mousedown")
-                touchmove = true;
             if (event.type == "mouseup")
-                touchmove = false;
+                touchId = null;
         }
     }
     function toggleSim(){
