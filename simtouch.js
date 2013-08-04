@@ -18,8 +18,18 @@
     window.addEventListener("load", function(){
         document.body.appendChild(button);
     }, false);
+    function TouchList(list){
+        list = list || [];
+        list.item = function(i){
+            return this[i] || null;
+        }
+        list.identifiedTouch = function(id){
+            return this[0].identifier == id ? this[0] : null;
+        }
+        return list;
+    }
     function appendProps(target, source, fieldList){
-        for (var i = 0; i < fieldList.length; i++){
+        for (var i = 0; i <fieldList.length; i++){
             target[fieldList[i]] = source[fieldList[i]];
         }
     }
@@ -36,23 +46,17 @@
                 touchElem = event.target;
             var dEvt = document.createEvent("HTMLEvents");
             dEvt.initEvent(mappings[event.type], !isRel, true);
-            dEvt.changedTouches = [{
+            dEvt.changedTouches = TouchList([{
                 force: 0,
                 identifier: 0,
                 radiusX: 1,
                 radiusY: 1,
                 rotationAngle: 0,
                 target: isRel ? event.target : touchElem
-            }];
+            }]);
             appendProps(dEvt.changedTouches[0], event, ["clientX","clientY","pageX","pageY","screenX","screenY"]);
-            dEvt.changedTouches.item = function(i){
-                return dEvt.changedTouches[i] || null;
-            };
-            dEvt.changedTouches.identifiedTouch = function(id){
-                return dEvt.changedTouches[0].identifier == id ? dEvt.changedTouches[0] : null;
-            };
-            dEvt.touches = event.type != "mouseup" ? dEvt.changedTouches : null;
-            dEvt.targetTouches = event.type != "mouseup" ? dEvt.touches : null;
+            dEvt.touches = event.type != "mouseup" ? dEvt.changedTouches : TouchList();
+            dEvt.targetTouches = event.type != "mouseup" ? dEvt.touches : TouchList();
             appendProps(dEvt, event, ["relatedTarget","altKey","ctrlKey","metaKey","shiftKey"]);
             dEvt.changedTouches[0].target.dispatchEvent(dEvt);
             if (event.type == "mouseup")
