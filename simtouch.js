@@ -34,7 +34,7 @@
             }];
             dEvt.targetTouches = dEvt.touches;
             dEvt.changedTouches = dEvt.touches;
-            dEvt.relatedTarget = /mouseover|mouseout/.test(event.type) ? event.relatedTarget : null;
+            dEvt.relatedTarget = event.relatedTarget;
             dEvt.altKey = event.altKey;
             dEvt.ctrlKey = event.ctrlKey;
             dEvt.metaKey = event.metaKey;
