@@ -39,7 +39,7 @@
     function toggleSim(){
         var i = 0, action = active ? "remove" : "add";
         if (active){
-            button.style.backgroundColor="";
+            button.style.backgroundColor="#ccc";
             document.body.style.cursor="";
         } else {
             button.style.backgroundColor="green";
