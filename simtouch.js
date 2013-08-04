@@ -29,23 +29,23 @@
         return list;
     }
     function appendProps(target, source, fieldList){
-        for (var i = 0; i <fieldList.length; i++){
+        for (var i = 0; i < fieldList.length; i++){
             target[fieldList[i]] = source[fieldList[i]];
         }
     }
     function intercept(event){
         event.stopPropagation();
         event.preventDefault();
-        var isRel = /mouseover|mouseout/.test(event.type);
-        if (touchElem === null && (isRel || event.type == "mousemove"))
+        var tEvt = mappings[event.type], isRel = /touchenter|touchleave/.test(tEvt);
+        if (touchElem === null && (isRel || tEvt == "touchmove"))
             return;
         if (event.type == "click" && event.target == button){
             toggleSim();
-        } else if (mappings[event.type]){
-            if (event.type == "mousedown")
+        } else if (tEvt){
+            if (tEvt == "touchstart")
                 touchElem = event.target;
             var dEvt = document.createEvent("HTMLEvents");
-            dEvt.initEvent(mappings[event.type], !isRel, true);
+            dEvt.initEvent(tEvt, !isRel, true);
             dEvt.changedTouches = TouchList([{
                 force: 0,
                 identifier: 0,
@@ -55,11 +55,11 @@
                 target: isRel ? event.target : touchElem
             }]);
             appendProps(dEvt.changedTouches[0], event, ["clientX","clientY","pageX","pageY","screenX","screenY"]);
-            dEvt.touches = event.type != "mouseup" ? dEvt.changedTouches : TouchList();
-            dEvt.targetTouches = event.type != "mouseup" ? dEvt.touches : TouchList();
+            dEvt.touches = tEvt != "touchend" ? dEvt.changedTouches : TouchList();
+            dEvt.targetTouches = tEvt != "touchend" ? dEvt.touches : TouchList();
             appendProps(dEvt, event, ["relatedTarget","altKey","ctrlKey","metaKey","shiftKey"]);
             dEvt.changedTouches[0].target.dispatchEvent(dEvt);
-            if (event.type == "mouseup")
+            if (tEvt == "touchend")
                 touchElem = null;
         }
     }
