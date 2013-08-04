@@ -11,6 +11,8 @@ All triggered touch events will have a 'touches' array with a single entry. This
 
 The simulation can be turned off by clicking the "Touch" button again.
 
+simtouch requires a browser that supports addEventListener() and document.createEvent()
+
 
 Demo
 ====
