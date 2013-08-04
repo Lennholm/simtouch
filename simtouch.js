@@ -21,13 +21,13 @@
     function intercept(event){
         event.stopPropagation();
         event.preventDefault();
-        if (!touchId && /mousemove|mouseover|mouseout/.test(event.type))
+        if (touchId === null && /mousemove|mouseover|mouseout/.test(event.type))
             return;
         if (event.type == "click" && event.target == button){
             toggleSim();
         } else if (mappings[event.type]){
             if (event.type == "mousedown")
-                touchId = parseInt(Math.random()*1e10);
+                touchId = 0;
             var dEvt = document.createEvent("HTMLEvents");
             dEvt.initEvent(mappings[event.type], true, true);
             dEvt.touches = [{
