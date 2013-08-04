@@ -18,6 +18,11 @@
     window.addEventListener("load", function(){
         document.body.appendChild(button);
     }, false);
+    function appendProps(target, source, fieldList){
+        for (var i = 0; i < fieldList.length; i++){
+            target[fieldList[i]] = source[fieldList[i]];
+        }
+    }
     function intercept(event){
         event.stopPropagation();
         event.preventDefault();
@@ -32,19 +37,14 @@
             var dEvt = document.createEvent("HTMLEvents");
             dEvt.initEvent(mappings[event.type], !isRel, true);
             dEvt.changedTouches = [{
-                clientX: event.clientX,
-                clientY: event.clientY,
                 force: 0,
                 identifier: 0,
-                pageX: event.pageX,
-                pageY: event.pageY,
                 radiusX: 1,
                 radiusY: 1,
                 rotationAngle: 0,
-                screenX: event.screenX,
-                screenY: event.screenY,
                 target: isRel ? event.target : touchElem
             }];
+            appendProps(dEvt.changedTouches[0], event, ["clientX","clientY","pageX","pageY","screenX","screenY"]);
             dEvt.changedTouches.item = function(i){
                 return dEvt.changedTouches[i] || null;
             };
@@ -53,11 +53,7 @@
             };
             dEvt.touches = event.type != "mouseup" ? dEvt.changedTouches : null;
             dEvt.targetTouches = event.type != "mouseup" ? dEvt.touches : null;
-            dEvt.relatedTarget = event.relatedTarget;
-            dEvt.altKey = event.altKey;
-            dEvt.ctrlKey = event.ctrlKey;
-            dEvt.metaKey = event.metaKey;
-            dEvt.shiftKey = event.shiftKey;
+            appendProps(dEvt, event, ["relatedTarget","altKey","ctrlKey","metaKey","shiftKey"]);
             dEvt.changedTouches[0].target.dispatchEvent(dEvt);
             if (event.type == "mouseup")
                 touchElem = null;
