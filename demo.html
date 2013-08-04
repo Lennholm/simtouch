@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Simulate touch, demo</title>
+        <script type="text/javascript">
+            window.onload=function(){
+                var obj = document.getElementById("object"), tX, tY;
+                obj.addEventListener("click",function(){
+                    alert("Click!");
+                },false);
+                obj.addEventListener("mouseover",function(){
+                    this.style.backgroundColor="lightblue";
+                },false);
+                obj.addEventListener("mouseout",function(){
+                    this.style.backgroundColor="pink";
+                    this.innerHTML="";
+                },false);
+                obj.addEventListener("mousemove",function(event){
+                    this.innerHTML="Mouse x: " + event.pageX + "<br />Mouse y: " + event.pageY;
+                },false);
+                obj.addEventListener("touchstart", function(event){
+                    event.preventDefault();
+                    tX = event.touches[0].pageX-this.offsetLeft;
+                    tY = event.touches[0].pageY-this.offsetTop;
+                },false);
+                obj.addEventListener("touchmove", function(event){
+                    this.style.left = (event.touches[0].pageX - tX) + "px";
+                    this.style.top = (event.touches[0].pageY - tY) + "px";
+                    this.innerHTML="Touch x: " + event.touches[0].pageX + "<br />Touch y: " + event.touches[0].pageY;
+                },false);
+                obj.addEventListener("touchend", function(){
+                    this.style.backgroundColor="lightgreen";
+                    setTimeout(function(){
+                        obj.style.backgroundColor="pink";
+                    },500)
+                }, false);
+            }
+        </script>
+        <script type="text/javascript" src="simtouch.js"></script>
+    </head>
+    <body>
+        <div id="object" style="position:absolute;background-color: pink;width: 150px;height: 150px;border-radius: 10px;"></div>
+    </body>
+</html>
