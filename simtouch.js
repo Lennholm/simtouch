@@ -2,7 +2,7 @@
     var button = document.createElement("button"),
         active = false,
         touchmove = false,
-        mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove"},
+        mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove", mouseover: "touchenter", mouseout: "touchleave"},
         interceptions = ["mouseover","mouseout","mouseenter","mouseleave","mousemove","mousedown","mouseup","click"];
 
     button.innerHTML = "Touch";
@@ -32,6 +32,13 @@
                 pageX: event.pageX,
                 pageY: event.pageY
             }];
+            dEvt.targetTouches = dEvt.touches;
+            dEvt.changedTouches = dEvt.touches;
+            dEvt.relatedTarget = /mouseover|mouseout/.test(event.type) ? event.relatedTarget : null;
+            dEvt.altKey = event.altKey;
+            dEvt.ctrlKey = event.ctrlKey;
+            dEvt.metaKey = event.metaKey;
+            dEvt.shiftKey = event.shiftKey;
             event.target.dispatchEvent(dEvt);
             if (event.type == "mousedown")
                 touchmove = true;
