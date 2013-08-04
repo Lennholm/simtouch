@@ -56,7 +56,7 @@
             }]);
             appendProps(dEvt.changedTouches[0], event, ["clientX","clientY","pageX","pageY","screenX","screenY"]);
             dEvt.touches = tEvt != "touchend" ? dEvt.changedTouches : TouchList();
-            dEvt.targetTouches = tEvt != "touchend" ? dEvt.touches : TouchList();
+            dEvt.targetTouches = dEvt.touches;
             appendProps(dEvt, event, ["relatedTarget","altKey","ctrlKey","metaKey","shiftKey"]);
             dEvt.changedTouches[0].target.dispatchEvent(dEvt);
             if (tEvt == "touchend")
