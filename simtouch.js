@@ -1,7 +1,7 @@
 ;(function(document, window){
     var button = document.createElement("button"),
         active = false,
-        touchId = null,
+        touchElem = null,
         mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove", mouseover: "touchenter", mouseout: "touchleave"},
         interceptions = ["mouseover","mouseout","mouseenter","mouseleave","mousemove","mousedown","mouseup","click"];
 
@@ -21,20 +21,21 @@
     function intercept(event){
         event.stopPropagation();
         event.preventDefault();
-        if (touchId === null && /mousemove|mouseover|mouseout/.test(event.type))
+        var isRel = /mouseover|mouseout/.test(event.type);
+        if (touchElem === null && (isRel || event.type == "mousemove"))
             return;
         if (event.type == "click" && event.target == button){
             toggleSim();
         } else if (mappings[event.type]){
             if (event.type == "mousedown")
-                touchId = 0;
+                touchElem = event.target;
             var dEvt = document.createEvent("HTMLEvents");
-            dEvt.initEvent(mappings[event.type], true, true);
-            dEvt.touches = [{
+            dEvt.initEvent(mappings[event.type], !isRel, true);
+            dEvt.changedTouches = [{
                 clientX: event.clientX,
                 clientY: event.clientY,
                 force: 0,
-                identifier: touchId,
+                identifier: 0,
                 pageX: event.pageX,
                 pageY: event.pageY,
                 radiusX: 1,
@@ -42,24 +43,24 @@
                 rotationAngle: 0,
                 screenX: event.screenX,
                 screenY: event.screenY,
-                target: event.target
+                target: isRel ? event.target : touchElem
             }];
-            dEvt.touches.item = function(i){
-                return dEvt.touches[i] || null;
+            dEvt.changedTouches.item = function(i){
+                return dEvt.changedTouches[i] || null;
             };
-            dEvt.touches.identifiedTouch = function(id){
-                return dEvt.touches[0].identifier == id ? dEvt.touches[0] : null;
+            dEvt.changedTouches.identifiedTouch = function(id){
+                return dEvt.changedTouches[0].identifier == id ? dEvt.changedTouches[0] : null;
             };
-            dEvt.targetTouches = dEvt.touches;
-            dEvt.changedTouches = dEvt.touches;
+            dEvt.touches = event.type != "mouseup" ? dEvt.changedTouches : null;
+            dEvt.targetTouches = event.type != "mouseup" ? dEvt.touches : null;
             dEvt.relatedTarget = event.relatedTarget;
             dEvt.altKey = event.altKey;
             dEvt.ctrlKey = event.ctrlKey;
             dEvt.metaKey = event.metaKey;
             dEvt.shiftKey = event.shiftKey;
-            event.target.dispatchEvent(dEvt);
+            dEvt.changedTouches[0].target.dispatchEvent(dEvt);
             if (event.type == "mouseup")
-                touchId = null;
+                touchElem = null;
         }
     }
     function toggleSim(){
