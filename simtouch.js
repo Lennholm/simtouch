@@ -21,7 +21,7 @@
     function intercept(event){
         event.stopPropagation();
         event.preventDefault();
-        if (event.type == "mousemove" && !touchmove)
+        if (!touchmove && /mousemove|mouseover|mouseout/.test(event.type))
             return;
         if (event.type == "click" && event.target == button){
             toggleSim();
