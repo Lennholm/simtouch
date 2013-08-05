@@ -2,6 +2,8 @@
     var button = document.createElement("button"),
         active = false,
         touchElem = null,
+        startPrevented = false,
+        stopDispatch = false,
         mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove", mouseover: "touchenter", mouseout: "touchleave"},
         interceptions = ["mouseover","mouseout","mouseenter","mouseleave","mousemove","mousedown","mouseup","click"];
 
@@ -37,13 +39,22 @@
         event.stopPropagation();
         event.preventDefault();
         var tEvt = mappings[event.type], isRel = /touchenter|touchleave/.test(tEvt);
-        if (touchElem === null && (isRel || tEvt == "touchmove"))
-            return;
         if (event.type == "click" && event.target == button){
             toggleSim();
-        } else if (tEvt){
-            if (tEvt == "touchstart")
+            return;
+        }
+        if (touchElem === null && (isRel || tEvt == "touchmove"))
+            return;
+        if (tEvt == "touchmove"){
+            if (stopDispatch)
+                return;
+            stopDispatch = !startPrevented;
+        }
+        if (tEvt){
+            if (tEvt == "touchstart"){
                 touchElem = event.target;
+                touchElem.addEventListener("touchstart", registerPrevention, false);
+            }
             var dEvt = document.createEvent("HTMLEvents");
             dEvt.initEvent(tEvt, !isRel, true);
             dEvt.changedTouches = TouchList([{
@@ -59,9 +70,15 @@
             dEvt.targetTouches = dEvt.touches;
             appendProps(dEvt, event, ["relatedTarget","altKey","ctrlKey","metaKey","shiftKey"]);
             dEvt.changedTouches[0].target.dispatchEvent(dEvt);
-            if (tEvt == "touchend")
+            if (tEvt == "touchend"){
                 touchElem = null;
+                startPrevented = stopDispatch = false;
+            }
         }
+    }
+    function registerPrevention(event){
+        startPrevented = event.defaultPrevented;
+        this.removeEventListener("touchstart", registerPrevention, false);
     }
     function toggleSim(){
         var i = 0, action = active ? "remove" : "add";
