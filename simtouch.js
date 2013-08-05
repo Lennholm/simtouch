@@ -68,9 +68,17 @@
         if (active){
             button.style.backgroundColor = "#ccc";
             document.body.style.cursor = "";
+            for (var key in mappings){
+                delete window["on" + mappings[key]];
+                delete Node.prototype["on" + mappings[key]];
+            }
         } else {
             button.style.backgroundColor = "green";
             document.body.style.cursor = "pointer";
+            for (var key in mappings){
+                window["on" + mappings[key]] = "simtouch";
+                Node.prototype["on" + mappings[key]] = "simtouch";
+            }
         }
         for (; i < interceptions.length; i++){
             document.body[action + "EventListener"](interceptions[i], intercept, true);
