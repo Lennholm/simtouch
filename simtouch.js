@@ -3,7 +3,6 @@
         active = false,
         touchElem = null,
         prevention = false,
-        stopDispatch = false,
         moved = false,
         mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove", mouseover: "touchenter", mouseout: "touchleave"},
         interceptions = ["mouseover","mouseout","mouseenter","mouseleave","mousemove","mousedown","mouseup","click"];
@@ -46,17 +45,24 @@
         }
         if (touchElem === null && (isRel || tEvt == "touchmove"))
             return;
-        if (tEvt == "touchmove"){
-            if (stopDispatch)
+        if (tEvt == "touchmove" && moved){
+            while (!touchElem.simtouchEventChain.prevention && touchElem != document.body){
+                touchElem.removeEventListener("touchmove", registerMovePrevention, false);
+                touchElem.removeEventListener("touchend", defaultArbiter, false);
+                touchElem = touchElem.parentNode;
+            }
+            if (!touchElem.simtouchEventChain.prevention)
                 return;
-            stopDispatch = !prevention;
-            moved = true;
         }
         if (tEvt){
             if (tEvt == "touchstart"){
                 touchElem = event.target;
-                touchElem.addEventListener("touchstart", trackPrevention, false);
-                touchElem.addEventListener("touchmove", trackPrevention, false);
+                var bubbleNode = touchElem;
+                while (bubbleNode != document.body.parentNode){
+                    bubbleNode.addEventListener("touchstart", registerStartPrevention, false);
+                    bubbleNode.addEventListener("touchmove", registerMovePrevention, false);
+                    bubbleNode = bubbleNode.parentNode;
+                }
                 touchElem.addEventListener("touchend", defaultArbiter, false);
             }
             var dEvt = document.createEvent("HTMLEvents");
@@ -74,35 +80,38 @@
             dEvt.targetTouches = dEvt.touches;
             appendProps(dEvt, event, ["relatedTarget","altKey","ctrlKey","metaKey","shiftKey"]);
             dEvt.changedTouches[0].target.dispatchEvent(dEvt);
-            if (tEvt == "touchend"){
+            if (tEvt == "touchend")
                 touchElem = null;
-                stopDispatch = moved = false;
-            }
         }
     }
-    function trackPrevention(event){
-        prevention = event.defaultPrevented || prevention;
-        if (event.type == "touchstart")
-            this.removeEventListener("touchstart", trackPrevention, false);
+    function registerStartPrevention(event){
+        this.simtouchEventChain = {prevention: event.defaultPrevented};
+        this.removeEventListener("touchstart", registerStartPrevention, false);
+    }
+    function registerMovePrevention(event){
+        event.target.simtouchEventChain.prevention = event.defaultPrevented || event.target.simtouchEventChain.prevention;
+        moved = true;
     }
     function defaultArbiter(event){
-        if (!prevention && touchElem != button && !moved){
-            toggleInterceptions(false);
+        if (touchElem != button && !touchElem.simtouchEventChain.prevention && !moved)
             dispatchMouseEvents(event);
-            toggleInterceptions(active);
+        moved = false;
+        var bubbleNode = this;
+        while (bubbleNode != document.body.parentNode){
+            bubbleNode.removeEventListener("touchmove", registerMovePrevention, false);
+            bubbleNode.removeEventListener("touchend", defaultArbiter, false);
+            bubbleNode = bubbleNode.parentNode;
         }
-        prevention = false;
-        this.removeEventListener("touchmove", trackPrevention, false);
-        this.removeEventListener("touchend", trackPrevention, false);
-        this.removeEventListener("touchend", defaultArbiter, false);
     }
     function dispatchMouseEvents(event,click){
         var evts = ["mousemove","mousedown","mouseup","click"];
+        toggleInterceptions(false);
         for (var i = 0; i < evts.length; i++){
             var mEvt = document.createEvent("MouseEvents");
             mEvt.initEvent(evts[i], true, true);
             touchElem.dispatchEvent(mEvt);
         }
+        toggleInterceptions(active);
     }
     function toggleSim(){
         if (active){
