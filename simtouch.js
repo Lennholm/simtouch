@@ -3,7 +3,7 @@
         active = false,
         touchElem = null,
         prevention = false,
-        mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove", mouseover: "touchenter", mouseout: "touchleave"},
+        mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove"/*, mouseover: "touchenter", mouseout: "touchleave"*/},
         interceptions = ["mouseover","mouseout","mouseenter","mouseleave","mousemove","mousedown","mouseup","click"];
 
     if (!('ontouchstart' in window)){
@@ -39,7 +39,7 @@
     function intercept(event){
         event.stopPropagation();
         event.preventDefault();
-        var tEvt = mappings[event.type], isRel = /touchenter|touchleave/.test(tEvt);
+        var tEvt = mappings[event.type], isRel = false;//touchenter|touchleave/.test(tEvt);
         if (event.target == button && event.type == "click"){
             toggleSim();
             return;
