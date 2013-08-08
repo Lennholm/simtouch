@@ -3,23 +3,24 @@
         active = false,
         touchElem = null,
         prevention = false,
-        moved = false,
         mappings = {mousedown: "touchstart", mouseup: "touchend", mousemove: "touchmove", mouseover: "touchenter", mouseout: "touchleave"},
         interceptions = ["mouseover","mouseout","mouseenter","mouseleave","mousemove","mousedown","mouseup","click"];
 
-    button.innerHTML = "Touch";
-    button.style.backgroundColor = "#ccc";
-    button.style.position = "fixed";
-    button.style.left = "5px";
-    button.style.top = "5px";
-    button.disabled = !window.addEventListener || !document.createEvent;
+    if (!('ontouchstart' in window)){
+        button.innerHTML = "Touch";
+        button.style.backgroundColor = "#ccc";
+        button.style.position = "fixed";
+        button.style.left = "5px";
+        button.style.top = "5px";
+        button.disabled = !window.addEventListener || !document.createEvent;
 
-    document.addEventListener("DOMContentLoaded", function(){
-        document.body.appendChild(button);
-    }, false);
-    window.addEventListener("load", function(){
-        document.body.appendChild(button);
-    }, false);
+        document.addEventListener("DOMContentLoaded", function(){
+            document.body.appendChild(button);
+        }, false);
+        window.addEventListener("load", function(){
+            document.body.appendChild(button);
+        }, false);
+    }
     function TouchList(list){
         list = list || [];
         list.item = function(i){
@@ -45,15 +46,6 @@
         }
         if (touchElem === null && (isRel || tEvt == "touchmove"))
             return;
-        if (tEvt == "touchmove" && moved){
-            while (!touchElem.simtouchEventChain.prevention && touchElem != document.body){
-                touchElem.removeEventListener("touchmove", registerMovePrevention, false);
-                touchElem.removeEventListener("touchend", defaultArbiter, false);
-                touchElem = touchElem.parentNode;
-            }
-            if (!touchElem.simtouchEventChain.prevention)
-                return;
-        }
         if (tEvt){
             if (tEvt == "touchstart"){
                 touchElem = event.target;
@@ -85,21 +77,20 @@
         }
     }
     function registerStartPrevention(event){
-        this.simtouchEventChain = {prevention: event.defaultPrevented};
+        prevention: event.defaultPrevented || prevention;
         this.removeEventListener("touchstart", registerStartPrevention, false);
     }
     function registerMovePrevention(event){
-        event.target.simtouchEventChain.prevention = event.defaultPrevented || event.target.simtouchEventChain.prevention;
-        moved = true;
+        prevention = true;
     }
     function defaultArbiter(event){
-        if (touchElem != button && !touchElem.simtouchEventChain.prevention && !moved)
+        if (touchElem != button && !prevention)
             dispatchMouseEvents(event);
-        moved = false;
+        this.removeEventListener("touchend", defaultArbiter, false);
+        prevention = false;
         var bubbleNode = this;
         while (bubbleNode != document.body.parentNode){
             bubbleNode.removeEventListener("touchmove", registerMovePrevention, false);
-            bubbleNode.removeEventListener("touchend", defaultArbiter, false);
             bubbleNode = bubbleNode.parentNode;
         }
     }
