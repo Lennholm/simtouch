@@ -5,7 +5,7 @@ Simulate touch events with the mouse pointer
 
 This script will place a button labeled "Touch" in the top left corner of the page. When clicked, all mouse events (including **click** events) on the page will be disabled, instead the mouse will be used to simulate touch events.
 
-Pressing down the mouse button will trigger a **touchstart** event, no other touch events are triggered unless **touchstart** happens. Moving the mouse pointer while pressing the button will trigger **touchmove** events, moving the mouse pointer over an element will trigger a **touchenter** event on that element, moving the mouse pointer away from an element will trigger a **touchleave** event on that element and releasing the mouse button will trigger a **touchend** event. The **touchcancel** event is never triggered.
+Pressing down the mouse button will trigger a **touchstart** event, no other touch events are triggered unless **touchstart** happens. Moving the mouse pointer while pressing the button will trigger **touchmove** events and releasing the mouse button will trigger a **touchend** event. The **touchcancel** event is never triggered.
 
 The touch events conform to the *TouchEvent* interface specification, meaning they will have the *TouchLists* `touches`, `targetTouches` and `changedTouches`. Since only one touch point is possible, all these *TouchLists* are identical except on the **touchend** event where `touches` and `targetTouches` are empty. The *TouchEvent* also has the `relatedTarget` property and the required flags for modifier keys.
 
