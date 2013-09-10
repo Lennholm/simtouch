@@ -1,5 +1,8 @@
-;
-(function(document, window) {
+// Released under the MIT License (MIT)
+// 
+// Copyright (c) 2013 Mikael Lennholm
+
+;(function(document, window) {
     var button = document.createElement("button"), 
     active = false, 
     touchElem = null, 
