@@ -96,7 +96,7 @@
         }
     }
     function registerStartPrevention(event) {
-        prevention: event.defaultPrevented || event.returnValue || prevention;
+        prevention: event.defaultPrevented || event.returnValue === false || prevention;
         this.removeEventListener("touchstart", registerStartPrevention, false);
     }
     function registerMovePrevention(event) {
@@ -125,7 +125,7 @@
         toggleInterceptions(active);
     }
     function fakeClick(event) {
-        if (!event.defaultPrevented)
+        if (!event.defaultPrevented && event.returnValue !== false)
             window.location.href = this.href;
     }
     function toggleSim() {
