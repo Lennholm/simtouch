@@ -96,7 +96,7 @@
         }
     }
     function registerStartPrevention(event) {
-        prevention: event.defaultPrevented || prevention;
+        prevention: event.defaultPrevented || event.returnValue || prevention;
         this.removeEventListener("touchstart", registerStartPrevention, false);
     }
     function registerMovePrevention(event) {
